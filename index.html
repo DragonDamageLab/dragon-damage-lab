@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dragon Damage Lab</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    :root {
+        --bg: #080b13;
+        --panel: #111624;
+        --panel2: #171d2e;
+        --border: #2a334b;
+        --text: #f4f6fb;
+        --muted: #9aa5bc;
+        --accent: #8b5cf6;
+        --accent2: #ec4899;
+        --green: #22c55e;
+        --red: #ef4444;
+        --gold: #f59e0b;
+        --blue: #3b82f6;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        background:
+            radial-gradient(circle at 15% 10%, rgba(139,92,246,.18), transparent 30%),
+            radial-gradient(circle at 85% 20%, rgba(236,72,153,.12), transparent 28%),
+            var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+    }
+
+    header {
+        border-bottom: 1px solid var(--border);
+        background: rgba(8,11,19,.88);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+
+    .nav {
+        max-width: 1200px;
+        margin: auto;
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .logo-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        font-size: 23px;
+        box-shadow: 0 0 25px rgba(139,92,246,.35);
+    }
+
+    nav {
+        display: flex;
+        gap: 8px;
+    }
+
+    nav button {
+        background: transparent;
+        border: 0;
+        color: var(--muted);
+        padding: 9px 13px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    nav button:hover,
+    nav button.active {
+        background: var(--panel2);
+        color: white;
+    }
+
+    main {
+        max-width: 1200px;
+        margin: auto;
+        padding: 38px 22px 70px;
+    }
+
+    .hero {
+        text-align: center;
+        padding: 25px 0 38px;
+    }
+
+    .hero h1 {
+        font-size: clamp(38px, 6vw, 70px);
+        line-height: 1;
+        letter-spacing: -2px;
+        background: linear-gradient(90deg, #fff, #c4b5fd, #f9a8d4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .hero p {
+        max-width: 680px;
+        margin: 18px auto 0;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.6;
+    }
+
+    .badge {
+        display: inline-block;
+        margin-bottom: 17px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(139,92,246,.12);
+        border: 1px solid rgba(139,92,246,.35);
+        color: #c4b5fd;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .panel {
+        background: linear-gradient(180deg, rgba(23,29,46,.96), rgba(13,17,28,.96));
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 15px 40px rgba(0,0,0,.2);
+    }
+
+    .panel.full {
+        grid-column: 1 / -1;
+    }
+
+    .panel-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .panel-title h2 {
+        font-size: 18px;
+    }
+
+    .panel-title span {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    label {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 7px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    select,
+    input {
+        width: 100%;
+        padding: 13px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #0b0f1a;
+        color: white;
+        outline: none;
+        font-size: 14px;
+    }
+
+    select:focus,
+    input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(139,92,246,.12);
+    }
+
+    .field {
+        margin-bottom: 16px;
+    }
+
+    .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .stat {
+        background: rgba(8,11,19,.7);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 13px;
+    }
+
+    .stat small {
+        color: var(--muted);
+        display: block;
+        font-size: 10px;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .stat strong {
+        font-size: 17px;
+    }
+
+    .element {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 9px;
+        border-radius: 7px;
+        font-size: 11px;
+        font-weight: 800;
+        margin: 3px 3px 0 0;
+        background: #20283b;
+        color: #dbe3f5;
+    }
+
+    .element.fire { background: #51251e; color: #ffb4a8; }
+    .element.water { background: #17385a; color: #93c5fd; }
+    .element.nature { background: #183c29; color: #86efac; }
+    .element.war { background: #4b2028; color: #fda4af; }
+    .element.soul { background: #3d2058; color: #d8b4fe; }
+    .element.chaos { background: #4a1646; color: #f0abfc; }
+    .element.time { background: #40300f; color: #fde68a; }
+    .element.primal { background: #153f46; color: #99f6e4; }
+    .element.dark { background: #24213d; color: #c4b5fd; }
+
+    .toggle-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .toggle {
+        cursor: pointer;
+        border: 1px solid var(--border);
+        background: #0b0f1a;
+        color: var(--muted);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        transition: .15s;
+    }
+
+    .toggle:hover {
+        border-color: #59647d;
+    }
+
+    .toggle.active {
+        border-color: var(--accent);
+        background: rgba(139,92,246,.14);
+        color: #ddd6fe;
+    }
+
+    .calculate {
+        width: 100%;
+        border: 0;
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 8px;
+        color: white;
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        box-shadow: 0 10px 30px rgba(139,92,246,.2);
+        transition: transform .15s, box-shadow .15s;
+    }
+
+    .calculate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 35px rgba(139,92,246,.3);
+    }
+
+    .result {
+        text-align: center;
+        padding: 30px 20px;
+        border-radius: 15px;
+        background:
+            radial-gradient(circle at center, rgba(139,92,246,.18), transparent 55%),
+            #0a0e18;
+        border: 1px solid var(--border);
+    }
+
+    .result-label {
+        color: var(--muted);
+        text-transform: uppercase;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .damage {
+        font-size: clamp(45px, 8vw, 76px);
+        font-weight: 900;
+        margin: 5px 0;
+        color: white;
+        text-shadow: 0 0 35px rgba(139,92,246,.5);
+    }
+
+    .damage.critical {
+        color: #f9a8d4;
+        text-shadow: 0 0 35px rgba(236,72,153,.55);
+    }
+
+    .critical-label {
+        display: inline-block;
+        padding: 6px 10px;
+        background: rgba(236,72,153,.12);
+        border: 1px solid rgba(236,72,153,.35);
+        color: #f9a8d4;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .breakdown {
+        margin-top: 20px;
+        display: grid;
+        gap: 8px;
+    }
+
+    .break-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 11px 13px;
+        background: rgba(8,11,19,.65);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        font-size: 13px;
+    }
+
+    .break-row span:first-child {
+        color: var(--muted);
+    }
+
+    .break-row strong {
+        color: white;
+    }
+
+    .dragon-card {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 17px;
+        background: rgba(8,11,19,.5);
+    }
+
+    .dragon-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 13px;
+        display: grid;
+        place-items: center;
+        font-size: 25px;
+        background: linear-gradient(135deg, #312e81, #831843);
+        margin-bottom: 12px;
+    }
+
+    .dragon-card h3 {
+        margin-bottom: 5px;
+    }
+
+    .dragon-card p {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+
+    .notice {
+        margin-top: 20px;
+        padding: 14px;
+        border: 1px solid rgba(245,158,11,.25);
+        background: rgba(245,158,11,.06);
+        border-radius: 10px;
+        color: #fcd34d;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    footer {
+        text-align: center;
+        color: #68738b;
+        padding: 30px 20px 45px;
+        font-size: 12px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    @media (max-width: 800px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+
+        .panel.full {
+            grid-column: auto;
+        }
+
+        .nav {
+            flex-direction: column;
+        }
+
+        nav {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .stats {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 500px) {
+        main {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .two {
+            grid-template-columns: 1fr;
+        }
+
+        .stats {
+            grid-template-columns: 1fr;
+        }
+
+        .hero h1 {
+            font-size: 43px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="nav">
+        <div class="logo">
+            <div class="logo-icon">🐉</div>
+            <span>Dragon Damage Lab</span>
+        </div>
+
+        <nav>
+            <button class="active" onclick="showSection('lab', this)">Damage Lab</button>
+            <button onclick="showSection('dragons', this)">Dragons</button>
+            <button onclick="showSection('about', this)">About</button>
+        </nav>
+    </div>
+</header>
+
+<main>
+
+    <!-- DAMAGE LAB -->
+    <section id="lab">
+
+        <div class="hero">
+            <div class="badge">Dragon City Damage Calculator</div>
+            <h1>Dragon Damage Lab</h1>
+            <p>
+                Test attacks, critical hits, elemental advantages,
+                buffs and debuffs in one place.
+            </p>
+        </div>
+
+        <div class="grid">
+
+            <!-- ATTACKER -->
+            <div class="panel">
+                <div class="panel-title">
+                    <h2>⚔️ Attacker</h2>
+                    <span>Dragon attacking</span>
+                </div>
+
+                <div class="field">
+                    <label>Dragon</label>
+                    <select id="attacker">
+                        <option value="reaper">High Reaper Critical</option>
+                        <option value="warrior">War Dragon</option>
+                        <option value="nature">Nature Dragon</option>
+                        <option value="primal">Primal Dragon</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Attack</label>
+                    <input id="attack" type="number" value="120000">
+                </div>
+
+                <div class="field">
+                    <label>Skill</label>
+                    <select id="skill">
+                        <option value="basic">Basic Attack</option>
+                        <option value="reaper">Reaper's Command</option>
+                        <option value="lastbreath">Last Breath</option>
+                        <option value="brutal">Brutal Strike</option>
+                        <option value="chrono">Chrono Burst</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Elements</label>
+                    <div id="attackerElements">
+                        <span class="element soul">Soul</span>
+                        <span class="element chaos">Chaos</span>
+                        <span class="element war">War</span>
+                        <span class="element time">Time</span>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <small>Critical Chance</small>
+                        <strong id="critChanceDisplay">25%</strong>
+                    </div>
+                    <div class="stat">
+                        <small>Critical Damage</small>
+                        <strong id="critDamageDisplay">150%</strong>
+                    </div>
+                    <div class="stat">
+                        <small>Skill Power</small>
+                        <strong id="powerDisplay">100%</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEFENDER -->
+            <div class="panel">
+                <div class="panel-title">
+                    <h2>🛡️ Defender</h2>
+                    <span>Dragon receiving damage</span>
+                </div>
+
+                <div class="field">
+                    <label>Dragon</label>
+                    <select id="defender">
+                        <option value="normal">Training Dragon</option>
+                        <option value="fire">Fire Dragon</option>
+                        <option value="water">Water Dragon</option>
+                        <option value="nature">Nature Dragon</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Health</label>
+                    <input id="health" type="number" value="250000">
+                </div>
+
+                <div class="field">
+                    <label>Defense</label>
+                    <input id="defense" type="number" value="80000">
+                </div>
+
+                <div>
+                    <label>Defender Elements</label>
+                    <div id="defenderElements">
+                        <span class="element">Pure</span>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat">
+                        <small>Current HP</small>
+                        <strong id="currentHpDisplay">250K</strong>
+                    </div>
+                    <div class="stat">
+                        <small>Resistance</small>
+                        <strong id="resistanceDisplay">0%</strong>
+                    </div>
+                    <div class="stat">
+                        <small>Element Mult.</small>
+                        <strong id="elementDisplay">1.0×</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODIFIERS -->
+            <div class="panel">
+                <div class="panel-title">
+                    <h2>✨ Modifiers</h2>
+                    <span>Battle conditions</span>
+                </div>
+
+                <div class="field">
+                    <label>Buffs</label>
+                    <div class="toggle-row">
+                        <button class="toggle" onclick="toggle(this)" data-effect="attackBuff">⚔️ Attack +25%</button>
+                        <button class="toggle" onclick="toggle(this)" data-effect="critBuff">💥 Crit +25%</button>
+                        <button class="toggle" onclick="toggle(this)" data-effect="damageBuff">🔥 Damage +20%</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Debuffs</label>
+                    <div class="toggle-row">
+                        <button class="toggle" onclick="toggle(this)" data-effect="defenseBreak">🛡️ Defense -20%</button>
+                        <button class="toggle" onclick="toggle(this)" data-effect="weakness">💀 Weakness</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>Critical Override</label>
+                    <select id="criticalMode">
+                        <option value="normal">Normal chance</option>
+                        <option value="force">Force Critical</option>
+                        <option value="none">No Critical</option>
+                    </select>
+                </div>
+
+                <button class="calculate" onclick="calculateDamage()">
+                    ⚡ CALCULATE DAMAGE
+                </button>
+            </div>
+
+            <!-- RESULT -->
+            <div class="panel">
+                <div class="panel-title">
+                    <h2>📊 Damage Result</h2>
+                    <span>Calculation output</span>
+                </div>
+
+                <div class="result">
+                    <div class="result-label">Final Damage</div>
+                    <div id="damageResult" class="damage">0</div>
+                    <div id="criticalResult"></div>
+                </div>
+
+                <div class="breakdown">
+                    <div class="break-row">
+                        <span>Base Attack</span>
+                        <strong id="baseResult">0</strong>
+                    </div>
+
+                    <div class="break-row">
+                        <span>Skill Multiplier</span>
+                        <strong id="skillResult">100%</strong>
+                    </div>
+
+                    <div class="break-row">
+                        <span>Defense Reduction</span>
+                        <strong id="defenseResult">0</strong>
+                    </div>
+
+                    <div class="break-row">
+                        <span>Element Multiplier</span>
+                        <strong id="elementResult">1.0×</strong>
+                    </div>
+
+                    <div class="break-row">
+                        <span>Critical Multiplier</span>
+                        <strong id="critResult">1.0×</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK TEST -->
+            <div class="panel full">
+                <div class="panel-title">
+                    <h2>🐉 High Reaper Critical — Test Profile</h2>
+                    <span>Custom Dragon</span>
+                </div>
+
+                <div class="dragon-card">
+                    <div class="dragon-icon">☠️</div>
+
+                    <h3>High Reaper Critical</h3>
+
+                    <p>
+                        The High Reaper Critical doesn't believe in leaving
+                        things to chance. With his trusty scythe and deadly
+                        instincts, he makes sure his allies always know when
+                        it's time to strike.
+                    </p>
+
+                    <div>
+                        <span class="element soul">Soul</span>
+                        <span class="element chaos">Chaos</span>
+                        <span class="element war">War</span>
+                        <span class="element time">Time</span>
+                    </div>
+                </div>
+
+                <div class="notice">
+                    ⚠️ <strong>Prototype:</strong>
+                    This calculator currently uses an illustrative damage
+                    formula for testing the website interface. It is not
+                    claiming to reproduce Dragon City's official hidden
+                    damage formula. We can improve the formula as we build
+                    the calculator together.
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- DRAGONS -->
+    <section id="dragons" class="hidden">
+
+        <div class="hero">
+            <div class="badge">Dragon Collection</div>
+            <h1>Dragons</h1>
+            <p>
+                A future database for your Dragon Damage Lab.
+            </p>
+        </div>
+
+        <div class="grid">
+
+            <div class="panel">
+                <div class="dragon-card">
+                    <div class="dragon-icon">☠️</div>
+                    <h3>High Reaper Critical</h3>
+                    <p>Critical Family concept dragon.</p>
+                    <span class="element soul">Soul</span>
+                    <span class="element chaos">Chaos</span>
+                    <span class="element war">War</span>
+                    <span class="element time">Time</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="dragon-card">
+                    <div class="dragon-icon">🔥</div>
+                    <h3>Fire Dragon</h3>
+                    <p>Example dragon for testing elemental calculations.</p>
+                    <span class="element fire">Fire</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="dragon-card">
+                    <div class="dragon-icon">🌊</div>
+                    <h3>Water Dragon</h3>
+                    <p>Example dragon for testing elemental calculations.</p>
+                    <span class="element water">Water</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="dragon-card">
+                    <div class="dragon-icon">🌿</div>
+                    <h3>Nature Dragon</h3>
+                    <p>Example dragon for testing elemental calculations.</p>
+                    <span class="element nature">Nature</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="hidden">
+
+        <div class="hero">
+            <div class="badge">About the Project</div>
+            <h1>Dragon Damage Lab</h1>
+            <p>
+                A fan-made Dragon City-inspired damage testing laboratory.
+            </p>
+        </div>
+
+        <div class="panel">
+            <h2>🎯 Project Goal</h2>
+
+            <p style="color:var(--muted); line-height:1.7; margin-top:15px;">
+                Dragon Damage Lab is designed to become a powerful browser-based
+                calculator where players can test dragons, attacks, critical hits,
+                elements, buffs, debuffs and other battle mechanics.
+            </p>
+
+            <div class="notice">
+                This is a fan-made project and is not affiliated with
+                or endorsed by the developers of Dragon City.
+            </div>
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    Dragon Damage Lab • Fan-made project • Built for Dragon City enthusiasts 🐉
+</footer>
+
+<script>
+
+const skills = {
+    basic: 1.00,
+    reaper: 1.20,
+    lastbreath: 1.35,
+    brutal: 1.30,
+    chrono: 1.25
+};
+
+const defenders = {
+    normal: {
+        elements: ["Pure"],
+        multiplier: 1.00
+    },
+    fire: {
+        elements: ["Fire"],
+        multiplier: 1.00
+    },
+    water: {
+        elements: ["Water"],
+        multiplier: 1.00
+    },
+    nature: {
+        elements: ["Nature"],
+        multiplier: 1.00
+    }
+};
+
+function toggle(button) {
+    button.classList.toggle("active");
+}
+
+function formatNumber(number) {
+    return Math.round(number).toLocaleString();
+}
+
+function shortNumber(number) {
+    if (number >= 1000000) {
+        return (number / 1000000).toFixed(2) + "M";
+    }
+
+    if (number >= 1000) {
+        return (number / 1000).toFixed(1) + "K";
+    }
+
+    return Math.round(number).toString();
+}
+
+function calculateDamage() {
+
+    let attack = Number(document.getElementById("attack").value) || 0;
+    let defense = Number(document.getElementById("defense").value) || 0;
+
+    const skill = document.getElementById("skill").value;
+    const criticalMode = document.getElementById("criticalMode").value;
+
+    let skillMultiplier = skills[skill] || 1;
+
+    let attackBuff = document.querySelector('[data-effect="attackBuff"]').classList.contains("active");
+    let critBuff = document.querySelector('[data-effect="critBuff"]').classList.contains("active");
+    let damageBuff = document.querySelector('[data-effect="damageBuff"]').classList.contains("active");
+    let defenseBreak = document.querySelector('[data-effect="defenseBreak"]').classList.contains("active");
+    let weakness = document.querySelector('[data-effect="weakness"]').classList.contains("active");
+
+    if (attackBuff) {
+        attack *= 1.25;
+    }
+
+    if (defenseBreak) {
+        defense *= 0.80;
+    }
+
+    let baseDamage = Math.max(1, attack - defense);
+
+    let damage = baseDamage * skillMultiplier;
+
+    let elementMultiplier = 1.00;
+
+    /*
+        Prototype elemental testing:
+        This will eventually be replaced with a complete
+        Dragon City element interaction table.
+    */
+
+    const attacker = document.getElementById("attacker").value;
+    const defender = document.getElementById("defender").value;
+
+    if (attacker === "nature" && defender === "water") {
+        elementMultiplier = 1.50;
+    }
+
+    if (attacker === "water" && defender === "fire") {
+        elementMultiplier = 1.50;
+    }
+
+    if (attacker === "warrior" && defender === "nature") {
+        elementMultiplier = 1.50;
+    }
+
+    damage *= elementMultiplier;
+
+    if (weakness) {
+        damage *= 1.20;
+    }
+
+    if (damageBuff) {
+        damage *= 1.20;
+    }
+
+    let critChance = 0.25;
+
+    if (critBuff) {
+        critChance += 0.25;
+    }
+
+    let critical = false;
+
+    if (criticalMode === "force") {
+        critical = true;
+    }
+    else if (criticalMode === "none") {
+        critical = false;
+    }
+    else {
+        critical = Math.random() < critChance;
+    }
+
+    let criticalMultiplier = 1;
+
+    if (critical) {
+        criticalMultiplier = 1.50;
+        damage *= criticalMultiplier;
+    }
+
+    document.getElementById("damageResult").textContent =
+        formatNumber(damage);
+
+    document.getElementById("baseResult").textContent =
+        formatNumber(attack);
+
+    document.getElementById("skillResult").textContent =
+        Math.round(skillMultiplier * 100) + "%";
+
+    document.getElementById("defenseResult").textContent =
+        formatNumber(defense);
+
+    document.getElementById("elementResult").textContent =
+        elementMultiplier.toFixed(2) + "×";
+
+    document.getElementById("critResult").textContent =
+        critical ? "1.50×" : "1.00×";
+
+    const damageDisplay = document.getElementById("damageResult");
+    const criticalDisplay = document.getElementById("criticalResult");
+
+    if (critical) {
+        damageDisplay.classList.add("critical");
+        criticalDisplay.innerHTML =
+            '<span class="critical-label">💥 CRITICAL HIT!</span>';
+    }
+    else {
+        damageDisplay.classList.remove("critical");
+        criticalDisplay.innerHTML = "";
+    }
+}
+
+function showSection(section, button) {
+
+    document.getElementById("lab").classList.add("hidden");
+    document.getElementById("dragons").classList.add("hidden");
+    document.getElementById("about").classList.add("hidden");
+
+    document.getElementById(section).classList.remove("hidden");
+
+    document.querySelectorAll("nav button").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+}
+
+function updateDefender() {
+
+    const defender = document.getElementById("defender").value;
+    const data = defenders[defender];
+
+    const container = document.getElementById("defenderElements");
+
+    container.innerHTML = "";
+
+    data.elements.forEach(element => {
+
+        const span = document.createElement("span");
+
+        span.className = "element";
+
+        span.textContent = element;
+
+        container.appendChild(span);
+    });
+
+    document.getElementById("elementDisplay").textContent =
+        data.multiplier.toFixed(1) + "×";
+}
+
+document.getElementById("defender").addEventListener(
+    "change",
+    updateDefender
+);
+
+document.getElementById("health").addEventListener(
+    "input",
+    function() {
+        document.getElementById("currentHpDisplay").textContent =
+            shortNumber(Number(this.value) || 0);
+    }
+);
+
+document.getElementById("defense").addEventListener(
+    "input",
+    function() {
+        document.getElementById("defenseResult").textContent =
+            formatNumber(Number(this.value) || 0);
+    }
+);
+
+calculateDamage();
+
+</script>
+
+</body>
+</html>
